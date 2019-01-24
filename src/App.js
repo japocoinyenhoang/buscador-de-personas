@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Switch, Route} from 'react-router-dom';
 import{getApiData} from './services/personService';
 import Filter from './components/Filter';
 import './App.css';
@@ -59,14 +60,19 @@ class App extends Component {
   }
   render() {
     const blackResults=this.filterThis();
+    const {results}=this.state
     return (
       <div className="app">
       <h1 className="app__title">Buscador de Personas</h1>
-      <Filter keyupAction={this.getQuery} />
+    <Switch>
+      <Route exact path="/" render={()=><Filter keyupAction={this.getQuery} />} />
+      
+      </Switch>
 
-      <UserCard personResult={blackResults} personId={1} />
-      <UserList blackResults={blackResults} />
-       
+    <Switch>
+      <Route exact path="/" render={()=><UserList blackResults={blackResults} />} />
+      <Route path="/person/:id" render={props=><UserCard match={props.match} personResult={results} personId={1} />} />
+    </Switch>
     </div>
     );
   }
