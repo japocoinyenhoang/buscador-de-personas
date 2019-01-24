@@ -1,15 +1,39 @@
 import React, { Component } from 'react';
 import{getApiData} from './services/personService';
+import Filter from './components/Filter';
 import './App.css';
+import UserList from './components/UserList';
+import UserCard from './components/UserCard';
 
 class App extends Component {
   constructor(props){
     super(props);
 
     this.state={
+      query:'',
       results: this.getSaveData()
     };
+    this.getQuery=this.getQuery.bind(this);
   }
+ getQuery(e){
+   const userQuery=e.currentTarget.value;
+   this.setState({
+     query:userQuery
+   })
+ }
+  filterThis(){
+  const filteredResult=this.state.results.filter (item=>{
+    const fullName=`${item.name.first} ${item.name.last}`;
+    if (fullName.toLocaleLowerCase().includes(this.state.query.toLocaleLowerCase())){
+      return true;
+    }else{
+      return false;
+    }
+  //  ternario// return (fullName.includes(this.state.query))?true : false ;
+  });
+  return filteredResult;
+}
+
   getSaveData(){
     const userData=localStorage.getItem('userData');
     if(userData !==null){
@@ -34,24 +58,15 @@ class App extends Component {
     });
   }
   render() {
+    const blackResults=this.filterThis();
     return (
       <div className="app">
       <h1 className="app__title">Buscador de Personas</h1>
-        <ul className="app__list">
-        {this.state.results.map(item=>{
-          return(
-            <li className="app__list__item" id={item.id} key={item.id}>
-            <div className="person">
-            <h2 className="person__name">{`${item.name.first} ${item.name.last}`}</h2>
-            <img src={item.picture.medium} alt={`${item.name.first} ${item.name.last}`}/>
-            <div className="person__age">{item.dob.age}</div>
-            <div className="person__city">{item.location.city}</div>
+      <Filter keyupAction={this.getQuery} />
 
-            </div>
-            </li>
-          )
-        })}
-        </ul>
+      <UserCard personResult={blackResults} personId={1} />
+      <UserList blackResults={blackResults} />
+       
     </div>
     );
   }
